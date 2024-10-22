@@ -1,4 +1,5 @@
 #include <goto-programs/goto_convert_class.h>
+#include <goto-programs/destructor.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
@@ -877,13 +878,24 @@ void goto_convertt::remove_temporary_object(exprt &expr, goto_programt &dest)
 
   if (expr.operands().size() == 1)
   {
-    codet assignment("assign");
-    assignment.reserve_operands(2);
-    assignment.copy_to_operands(symbol_expr(new_symbol));
-    assignment.move_to_operands(expr.op0());
-    assignment.location() = expr.location();
-
     goto_programt tmp_program;
+    code_function_callt assignment;
+    if (get_destructor("move_assignment", ns, new_symbol.type, assignment))
+    {
+      address_of_exprt this_expr(symbol_expr(new_symbol));
+      assignment.arguments().push_back(this_expr);
+      assignment.arguments().push_back(address_of_exprt(expr.op0()));
+      assignment.location() = expr.location();
+    }
+    else
+    {
+      codet assignment("assign");
+      assignment.reserve_operands(2);
+      assignment.copy_to_operands(symbol_expr(new_symbol));
+      assignment.move_to_operands(expr.op0());
+      assignment.location() = expr.location();
+    }
+
     convert(assignment, tmp_program);
     dest.destructive_append(tmp_program);
   }
