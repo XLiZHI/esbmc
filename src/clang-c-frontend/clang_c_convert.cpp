@@ -372,6 +372,10 @@ bool clang_c_convertert::get_struct_union_class(const clang::RecordDecl &rd)
   /* update location with that of the type's definition */
   get_location_from_decl(*rd_def, t.location());
 
+  /* To avoid problems with circular dependencies, sym may be erased in
+   * get_struct_union_class_fields, so we copy before then */
+  symbolt symbol = *sym;
+
   // We have to add fields before methods as the fields are likely to be used
   // in the methods
   if (get_struct_union_class_fields(*rd_def, t))
@@ -406,7 +410,6 @@ bool clang_c_convertert::get_struct_union_class(const clang::RecordDecl &rd)
    * Do this by erasing and re-inserting because the order of definitions in the
    * context matters. This type should be defined after any of the types that it
    * is composed of. */
-  symbolt symbol = *sym;
   context.erase_symbol(symbol.id);
   symbol.type = t;
   sym = context.move_symbol_to_context(symbol);
