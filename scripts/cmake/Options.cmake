@@ -70,6 +70,9 @@ else()
   set(DEFAULT_LLVM_URL "https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.0/clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz")
   set(DEFAULT_LLVM_NAME "clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04")
 
+  set(DEFAULT_BOOLECTOR_URL "https://gitlab.com/xianzhiyuli/deps-store/-/raw/main/boolector-release.zip")
+  set(DEFAULT_BOOLECTOR_NAME boolector-release)
+
   set(DEFAULT_Z3_URL "https://github.com/Z3Prover/z3/releases/download/z3-4.13.3/z3-4.13.3-x64-glibc-2.35.zip")
   set(DEFAULT_Z3_NAME z3-4.13.3-x64-glibc-2.35)
 
@@ -82,6 +85,9 @@ endif()
 
 set(ESBMC_LLVM_URL ${DEFAULT_LLVM_URL} CACHE STRING "URL to download prebuilt LLVM")
 set(ESBMC_LLVM_NAME ${DEFAULT_LLVM_NAME} CACHE STRING "Name of the extracted directory of LLVM")
+
+set(ESBMC_BOOLECTOR_URL ${DEFAULT_BOOLECTOR_URL} CACHE STRING "URL to download prebuilt boolector")
+set(ESBMC_BOOLECTOR_NAME ${DEFAULT_BOOLECTOR_NAME} CACHE STRING "Name of the extracted directory of boolector")
 
 set(ESBMC_Z3_URL ${DEFAULT_Z3_URL} CACHE STRING "URL to download prebuilt Z3")
 set(ESBMC_Z3_NAME ${DEFAULT_Z3_NAME} CACHE STRING "Name of the extracted directory of Z3")

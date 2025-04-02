@@ -7,41 +7,10 @@ elseif(EXISTS $ENV{HOME}/boolector)
   set(ENABLE_BOOLECTOR ON)
 else()
   if(ENABLE_BOOLECTOR AND DOWNLOAD_DEPENDENCIES)
-    # Sadly... Boolector requires some manual execution
-    # before invoking its scripts. Thus, we can't use
-    # FetchContent here
-    CPMAddPackage(
-      NAME boolector
-      DOWNLOAD_ONLY YES
-      GITHUB_REPOSITORY Boolector/boolector
-      GIT_TAG 3.2.3)
-
-    # We can't use ExternalProject because we need it ready
-    # at configuration time
-
-    # TODO: Maybe we should do a PR to boolector repo and make our
-    # life easier in here.
-    message("[boolector] Setting up lingeling")
-    execute_process(COMMAND "./contrib/setup-lingeling.sh"
-                    WORKING_DIRECTORY ${boolector_SOURCE_DIR})
-
-    message("[boolector] Setting up btor2tools")
-    execute_process(COMMAND "./contrib/setup-btor2tools.sh"
-                    WORKING_DIRECTORY ${boolector_SOURCE_DIR})
-
-    message("[boolector] Configuring build")
-    execute_process(COMMAND ${boolector_SOURCE_DIR}/configure.sh --prefix ${boolector_BINARY_DIR}
-                    WORKING_DIRECTORY ${boolector_SOURCE_DIR})
-
-    message("[boolector] Building...")
-    execute_process(COMMAND make -j4 install
-      WORKING_DIRECTORY ${boolector_SOURCE_DIR}/build)
-
-    set(Boolector_DIR ${boolector_BINARY_DIR})
-    endif()
-
+    download_zip_and_extract(Boolector ${ESBMC_BOOLECTOR_URL})
+    set(Boolector_DIR ${CMAKE_BINARY_DIR}/Boolector/${ESBMC_BOOLECTOR_NAME})
+  endif()
 endif()
-
 
 if(ENABLE_BOOLECTOR)
   find_package(Boolector REQUIRED HINTS ${Boolector_DIR}/lib/cmake
