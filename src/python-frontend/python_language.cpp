@@ -1,3 +1,5 @@
+#define _WINSOCKAPI_
+
 #include <python-frontend/python_language.h>
 #include <python-frontend/python_converter.h>
 #include <python-frontend/python_annotation.h>
