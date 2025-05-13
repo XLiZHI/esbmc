@@ -14,6 +14,10 @@ on:
         description: "Whether to run tests (regression) for this build"
         required: true
         type: boolean
+      cheri-build:
+        description: "Whether to build cheri for this build"
+        required: false
+        type: boolean
 
 jobs:
   build:
@@ -28,6 +32,14 @@ jobs:
         sudo add-apt-repository -y "deb http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-16 main" &&
         sudo apt-get update
       if: ${{ startsWith(inputs.operating-system, 'ubuntu-') }}
+    - name: Build CHERI
+      if: ${{ inputs.cheri-build == true }}
+      run:  |   
+        sudo apt update &&
+        sudo apt install -y autoconf automake libtool pkg-config clang bison cmake mercurial ninja-build samba flex texinfo time libglib2.0-dev libpixman-1-dev libarchive-dev libarchive-tools libbz2-dev libattr1-dev libcap-ng-dev libexpat1-dev libgmp-dev bc &&
+        git clone https://github.com/CTSRD-CHERI/cheribuild.git &&
+        cd cheribuild &&
+        python3 cheribuild.py cheribsd-riscv64-purecap -d
     - name: Build ESBMC
       run: ./scripts/build.sh ${{ inputs.build-flags }}
     - uses: actions/upload-artifact@v4
