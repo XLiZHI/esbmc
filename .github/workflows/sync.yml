@@ -1,34 +1,42 @@
 name: Upstream Sync
 
-permissions:
-    contents: write
-
 on:
-    schedule:
-        - cron: "0 0 * * *"
-    workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch: # click the button on Github repo!
+    inputs:
+      sync_test_mode:
+        description: 'Fork Sync Test Mode'
+        type: boolean
+        default: false
 
 jobs:
-    sync_with_upstream:
-        name: Sync with Upstream
-        runs-on: ubuntu-latest
-        if: ${{ github.event.repository.fork }}
+  sync_with_upstream:
+    name: Sync with Upstream
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
+    steps:
+    - name: Checkout target repo
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ matrix.branch }}
 
-        steps:
-            - name: Checkout target repo
-              uses: actions/checkout@v3
+    - name: Sync Upstream
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+      with:
+        target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+        upstream_sync_repo: esbmc/esbmc
+        upstream_sync_branch: master
+        target_sync_branch: ${{ matrix.branch }}
+        test_mode: ${{ inputs.sync_test_mode }}
 
-            - name: Sync Upstream
-              uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
-              with:
-                  target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-                  upstream_sync_repo: esbmc/esbmc
-                  upstream_sync_branch: main
-                  target_sync_branch: main
-                  test_mode: false
-
-            - name: Check for Failure
-              if: failure()
-              run: |
-                  echo "[Error] You need to manually sync your fork."
-                  exit 1
+    - name: New commits found
+      if: steps.sync.outputs.has_new_commits == 'true'
+      run: echo "New commits were found to sync."
+    
+    - name: No new commits
+      if: steps.sync.outputs.has_new_commits == 'false'
+      run: echo "There were no new commits."
+      
+    - name: Show value of 'has_new_commits'
+      run: echo ${{ steps.sync.outputs.has_new_commits }}
