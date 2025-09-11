@@ -105,12 +105,8 @@ jobs:
       permissions:
         contents: write
       steps:
-        - name: Checkout PR branch (not merge ref)
+        - name: Checkout PR branch
           uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            fetch-depth: 0
-            persist-credentials: true
 
         - name: Set up Python
           uses: actions/setup-python@v5
