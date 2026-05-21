@@ -327,3 +327,19 @@ endforeach()
 list(REMOVE_DUPLICATES _camada_solvers)
 list(JOIN _camada_solvers " " _camada_solvers_str)
 set(ESBMC_AVAILABLE_SOLVERS "${_camada_solvers_str}" PARENT_SCOPE)
+
+# On Windows, install solver DLLs built by Camada's dependency system so that
+# the installed esbmc.exe can find them at runtime.
+if(WIN32 AND DEFINED CAMADA_DEPS_INSTALL_DIR)
+  foreach(_dll libz3.dll)
+    find_file(_solver_dll ${_dll}
+      HINTS "${CAMADA_DEPS_INSTALL_DIR}"
+      PATH_SUFFIXES bin
+      NO_DEFAULT_PATH)
+    if(_solver_dll)
+      message(STATUS "Windows will install ${_solver_dll}")
+      install(FILES "${_solver_dll}" DESTINATION bin)
+    endif()
+    unset(_solver_dll CACHE)
+  endforeach()
+endif()
