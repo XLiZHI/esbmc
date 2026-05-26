@@ -189,6 +189,7 @@ bool c_preprocess(const std::string &path, std::ostream &outstream, bool is_cpp)
   int fd, status;
   std::ostringstream str;
 
+  // caasd
   sprintf(out_file_buf, "/tmp/ESBMC_XXXXXX");
   fd = mkstemp(out_file_buf);
   if (fd < 0)
